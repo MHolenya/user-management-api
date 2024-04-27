@@ -8,7 +8,11 @@ dotenv.config()
 
 const PORT = process.env.PORT
 const MONGODB_URI = process.env.MONGODB_URI
-app.use(express.json())
+// Apply middleware globally
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Apply rate limiting middleware
+app.use(rateLimitingMiddleware);
 
 app.use('/user', userRoute)
 connectDB(MONGODB_URI)
