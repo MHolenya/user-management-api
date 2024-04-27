@@ -1,44 +1,21 @@
-const User = require('../models/User')
+import User from '../models/User.js';
+const userController = {
+  getUserById: async (req, res) => {
+    try {
 
-const getUserData = async (req, res) => {
-  try {
-    const users = await User.find()
-    res.json(users)
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
+      const userId = req.params.userId
+      const user = await User.findById(userId)
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+
+      res.json(user)
+
+    } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' })
+    }
   }
 }
 
-const createUser = async (req, res) => {
-  try {
-    const newUser = await User.create(req.body)
-    res.status(201).json(newUser)
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
-
-const updateUser = async (req, res) => {
-  try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    res.json(updatedUser)
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
-
-const deleteUser = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id)
-    res.status(204).send()
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
-
-module.exports = {
-  getUserData,
-  createUser,
-  updateUser,
-  deleteUser
-}
+export default userController
