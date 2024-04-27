@@ -13,7 +13,8 @@ const inputValidationMiddleware = [
     .isLength({ min: 8, max: 24 }).withMessage('Password must be between 8 and 24 characters long')
     .isString().withMessage('Password must be a string')
     .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-    .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one symbol'),
+    .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one symbol')
+    .matches(/[0-9]/).withMessage('Password must contain at least one number'),
 
   (req, res, next) => {
     const errors = validationResult(req)
