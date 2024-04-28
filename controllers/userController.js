@@ -73,22 +73,34 @@ const userController = {
       }
       // Verify password
       const isPassword = bcrypt.compare(password, user.password) // Await bcrypt.compare
-
       if (!isPassword) {
         return res.status(401).json({ message: 'Invalid Password' })
       }
       delete user.password
       // Generate JWT token
-      const token = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '15min' })
+      const accessToken = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '15min' })
 
+      const refreshToken = jwt.sign({ username: user.usermane }, process.env.REFRESH_JWT, { expiresIn: '1d' })
       // Send token as response
-      const expireDate = new Date(Date.now() + 15 * 60 * 1000)
-      res.cookie('token', token, {
+      const expireDate = new Date(Date.now() + 1 * 60 * 1000)
+      const expireDateRefreshToken = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
+      res.cookie('token', accessToken, {
         secure: true,
         httpOnly: true,
         expires: expireDate
       })
-      res.json({ message: 'User logged in successfully' })
+
+      res.cookie('refresh_token', refreshToken, {
+        secure: true,
+        httpOnly: true,
+        expires: expireDateRefreshToken
+      })
+
+      res.json({
+        message: 'User logged in successfully',
+        username: user.username
+      })
 
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
