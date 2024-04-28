@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 /**
  * Controller handling user-related operations.
@@ -10,7 +11,7 @@ const userController = {
    * @param {import('express').Request} req - Express request object.
    * @param {import('express').Response} res - Express response object.
    */
-  getUserById: async (req, res) => {
+  getUserByUsername: async (req, res) => {
     try {
       const username = req.params.username
       const user = await User.findOne({ username: username })
@@ -61,11 +62,31 @@ const userController = {
    * @param {import('express').Request} req - Express request object.
    * @param {import('express').Response} res - Express response object.
    */
-  login: async (req, res) => {
+  Login: async (req, res) => {
     try {
-      console.log('entro')
-    } catch (error) { }
-  },
+      const { email, password } = req.body
+      const user = await User.findOne({ email })
+
+      // Check if user exists
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid Email' })
+      }
+      // Verify password
+      const isPassword = bcrypt.compare(password, user.password) // Await bcrypt.compare
+
+      if (!isPassword) {
+        return res.status(401).json({ message: 'Invalid Password' })
+      }
+      // Generate JWT token
+      const token = jwt.sign({ userId: user._id, email: user.email }, process.env.SECRET_JWT, { expiresIn: '1h' })
+
+      // Send token as response
+      res.json({ token })
+
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' })
+    }
+  }
 
   // Update a user
 
