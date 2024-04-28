@@ -87,7 +87,7 @@ const userController = {
         secure: true,
         httpOnly: true,
       })
-      res.json({ message: 'User logged in successfully' })
+      res.json({ message: 'User logged in successfully', token })
 
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })

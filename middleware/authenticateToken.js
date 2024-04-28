@@ -1,18 +1,21 @@
 import jwt from 'jsonwebtoken'
 
 export default function authenticateToken(req, res, next) {
-  const SECRET_JWT = process.env.SECRET_JWT
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
-  // If no token, return 401
-  if (token == null) {
-    return res.sendStatus(401)
-  }
-  console.log(SECRET_JWT)
-  jwt.verify(token, SECRET_JWT, (err, user) => {
-    console.log(err)
-    if (err) return res.sendStatus(403)
+  console.log(req.cookies)
+  const token = req.cookies.token
+
+  try {
+    // If no token, return 401
+    if (!token) {
+      return res.sendStatus(401)
+    }
+
+    const user = jwt.verify(token, process.env.SECRET_JWT)
     req.user = user
     next()
-  })
+
+  } catch (error) {
+    res.clearCookie('token')
+    res.status(401).json({ message: 'Unauthorized' })
+  }
 }

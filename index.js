@@ -1,7 +1,8 @@
 import express from 'express'
+import cookieParser from 'cookie-parser';
 import userRoute from './routes/userRouter.js'
-import connectDB from './controllers/datatabaseController.js'
 import dotenv from 'dotenv'
+import connectDB from './controllers/datatabaseController.js'
 import rateLimitingMiddleware from './middleware/rateLimit.js'
 
 const app = express()
@@ -12,6 +13,8 @@ const MONGODB_URI = process.env.MONGODB_URI
 
 // Middleware to parse JSON bodies
 app.use(express.json())
+// Use cookie-parser middleware
+app.use(cookieParser())
 
 // Apply rate limiting middleware
 app.use(rateLimitingMiddleware)
