@@ -77,11 +77,17 @@ const userController = {
       if (!isPassword) {
         return res.status(401).json({ message: 'Invalid Password' })
       }
+      delete user.password
       // Generate JWT token
-      const token = jwt.sign({ userId: user._id, email: user.email }, process.env.SECRET_JWT, { expiresIn: '1h' })
+      console.log(user)
+      const token = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '1h' })
 
       // Send token as response
-      res.json({ token })
+      res.cookie('token', token, {
+        secure: true,
+        httpOnly: true,
+      })
+      res.json({ message: 'User logged in successfully' })
 
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
