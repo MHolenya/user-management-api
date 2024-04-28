@@ -79,15 +79,16 @@ const userController = {
       }
       delete user.password
       // Generate JWT token
-      console.log(user)
-      const token = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '1h' })
+      const token = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '15min' })
 
       // Send token as response
+      const expireDate = new Date(Date.now() + 15 * 60 * 1000)
       res.cookie('token', token, {
         secure: true,
         httpOnly: true,
+        expires: expireDate
       })
-      res.json({ message: 'User logged in successfully', token })
+      res.json({ message: 'User logged in successfully' })
 
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
