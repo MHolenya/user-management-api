@@ -92,12 +92,14 @@ export function authenticateJWT(req, res, next) {
       res.cookie('token', accessToken, {
         secure: true,
         httpOnly: true,
-        expires: expireDateToken
+        expires: expireDateToken,
+        sameSite: 'strict'
       })
       res.cookie('refresh_token', refreshToken, {
         secure: true,
         httpOnly: true,
-        expires: expireDateRefreshToken
+        expires: expireDateRefreshToken,
+        sameSite: 'strict'
       })
     }
     // Set user object in request

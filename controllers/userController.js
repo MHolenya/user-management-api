@@ -82,19 +82,21 @@ const userController = {
 
       const refreshToken = jwt.sign({ username: user.usermane }, process.env.REFRESH_JWT, { expiresIn: '1d' })
       // Send token as response
-      const expireDate = new Date(Date.now() + 1 * 60 * 1000)
+      const expireDate = new Date(Date.now() + 15 * 60 * 1000)
       const expireDateRefreshToken = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
       res.cookie('token', accessToken, {
         secure: true,
         httpOnly: true,
-        expires: expireDate
+        expires: expireDate,
+        sameSite: 'strict'
       })
 
       res.cookie('refresh_token', refreshToken, {
         secure: true,
         httpOnly: true,
-        expires: expireDateRefreshToken
+        expires: expireDateRefreshToken,
+        sameSite: 'strict'
       })
 
       res.json({
