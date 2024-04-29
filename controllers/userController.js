@@ -140,7 +140,7 @@ const userController = {
       if (newPassword) {
         const hashedPassword = await bcrypt.hash(newPassword, 10)
         user.password = hashedPassword
-      }
+      } s
       // Save the updated user
       await user.save()
 
