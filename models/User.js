@@ -4,8 +4,8 @@ import mongoose from 'mongoose'
  * Mongoose schema for user.
  */
 const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
+  username: { type: String, unique: true },
+  email: { type: String, unique: true },
   password: String,
   jwtoken: String,
   refreshToken: String,

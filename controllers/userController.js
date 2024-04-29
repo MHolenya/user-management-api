@@ -14,13 +14,12 @@ const userController = {
   getUserByUsername: async (req, res) => {
     try {
       const username = req.params.username
-      const user = await User.findOne({ username: username })
+      const user = await User.findOne({ username: username }, { password: 0 })
 
       // Check if user exists in the database
       if (!user) {
         return res.status(404).json({ error: 'User not found' })
       }
-
       res.json(user)
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' })
@@ -40,6 +39,15 @@ const userController = {
       if (!username || !email || !password) {
         return res.status(400).json({ message: 'Missing required fields' })
       }
+      const checkemail = await User.findOne({ email })
+      const checkuser = await User.findOne({ username })
+
+      if (checkuser) {
+        return res.status(400).json({ message: 'User already exists' })
+      }
+      if (checkemail) {
+        return res.status(400).json({ message: 'Email already exist' })
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10)
       const user = new User({
@@ -49,8 +57,8 @@ const userController = {
       })
 
       await user.save()
-
       res.json({ message: 'User created successfully' })
+
     } catch (error) {
       console.error('Error in signUp:', error)
       res.status(500).json({ message: 'Internal server error' })
@@ -107,11 +115,54 @@ const userController = {
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
     }
-  }
-
+  },
   // Update a user
+  updateUser: async (req, res) => {
+    try {
+
+      const { username } = req.user
+      const { email, newPassword } = req.body
+
+      // Find the user by username
+      const user = await User.findOne({ username })
+
+      // Check if the user exists
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+
+      // Update user's email if provided
+      if (email) {
+        user.email = email
+      }
+
+      // Update user's password if provided
+      if (newPassword) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        user.password = hashedPassword
+      }
+      // Save the updated user
+      await user.save()
+
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' })
+    }
+  },
 
   // Delete a user
+  deleteUser: async (req, res) => {
+    try {
+      const { username } = req.user
+      // Find the user by username and delete it
+      const user = await User.findOneAndDelete({ username })
+      // Check if the user exists
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' })
+    }
+  }
 }
 
 export default userController
