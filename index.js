@@ -1,19 +1,22 @@
 import express from 'express'
-import cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'
 import userRoute from './routes/userRouter.js'
 import dotenv from 'dotenv'
 import connectDB from './controllers/datatabaseController.js'
 import rateLimitingMiddleware from './middleware/rateLimit.js'
 import cors from 'cors'
 import csrf from 'csurf'
-const app = express()
+import logger from 'morgan'
+
 dotenv.config()
+const app = express()
+app.use(logger('dev'))
 
 const PORT = process.env.PORT
 const MONGODB_URI = process.env.MONGODB_URI
 const ORIGIN = process.env.ORIGIN.toString()
 
-var csrfProtection = csrf({ cookie: true })
+const csrfProtection = csrf({ cookie: true })
 
 // Middleware to parse JSON bodies
 app.use(express.json())
@@ -22,8 +25,7 @@ app.use(cors({ origin: ORIGIN, credentials: true }))
 app.use(cookieParser())
 
 // Use CSRF protection middleware
-//app.use(csrfProtection)
-
+//  app.use(csrfProtection)
 
 // Apply rate limiting middleware
 app.use(rateLimitingMiddleware)

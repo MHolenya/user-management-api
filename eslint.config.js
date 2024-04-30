@@ -11,7 +11,11 @@ const __dirname = path.dirname(__filename)
 const compat = new FlatCompat({ baseDirectory: __dirname, recommendedConfig: pluginJs.configs.recommended })
 
 export default [
-  { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
   { languageOptions: { globals: globals.browser } },
-  ...compat.extends('standard')
+  ...compat.extends('standard'),
+  {
+    rules: {
+      'space-before-function-paren': 'off'
+    }
+  }
 ]

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import userController from '../controllers/userController.js'
-import { authenticateJWT } from '../middleware/authenticateToken.js';
+import { authenticateJWT } from '../middleware/authenticateToken.js'
 import { inputValidationSignUp, inputValidationLogin } from '../middleware/inputValidation.js'
 /**
  * Express router instance for handling user routes.

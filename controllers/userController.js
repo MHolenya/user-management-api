@@ -14,7 +14,7 @@ const userController = {
   getUserByUsername: async (req, res) => {
     try {
       const username = req.params.username
-      const user = await User.findOne({ username: username }, { password: 0 })
+      const user = await User.findOne({ username }, { password: 0 })
 
       // Check if user exists in the database
       if (!user) {
@@ -58,7 +58,6 @@ const userController = {
 
       await user.save()
       res.json({ message: 'User created successfully' })
-
     } catch (error) {
       console.error('Error in signUp:', error)
       res.status(500).json({ message: 'Internal server error' })
@@ -111,7 +110,6 @@ const userController = {
         message: 'User logged in successfully',
         username: user.username
       })
-
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
     }
@@ -119,7 +117,6 @@ const userController = {
   // Update a user
   updateUser: async (req, res) => {
     try {
-
       const { username } = req.user
       const { email, newPassword } = req.body
 
@@ -140,10 +137,9 @@ const userController = {
       if (newPassword) {
         const hashedPassword = await bcrypt.hash(newPassword, 10)
         user.password = hashedPassword
-      } s
+      }
       // Save the updated user
       await user.save()
-
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
     }
