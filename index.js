@@ -20,7 +20,9 @@ const csrfProtection = csrf({ cookie: true })
 
 // Middleware to parse JSON bodies
 app.use(express.json())
+// Midleware cors 
 app.use(cors({ origin: ORIGIN, credentials: true }))
+
 // Use cookie-parser middleware
 app.use(cookieParser())
 

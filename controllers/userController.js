@@ -1,7 +1,7 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-
+import Token from '../models/Token.js'
 /**
  * Controller handling user-related operations.
  */
@@ -88,6 +88,7 @@ const userController = {
       const accessToken = jwt.sign({ username: user.usermane }, process.env.SECRET_JWT, { expiresIn: '15min' })
 
       const refreshToken = jwt.sign({ username: user.usermane }, process.env.REFRESH_JWT, { expiresIn: '1d' })
+
       // Send token as response
       const expireDate = new Date(Date.now() + 15 * 60 * 1000)
       const expireDateRefreshToken = new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -99,16 +100,19 @@ const userController = {
         sameSite: 'strict'
       })
 
-      res.cookie('refresh_token', refreshToken, {
-        secure: true,
-        httpOnly: true,
-        expires: expireDateRefreshToken,
-        sameSite: 'strict'
+      const mongoRefreshToken = new Token({
+        refresh_token: refreshToken,
+        userId: user.id,
+        refresh_token_expiration: expireDateRefreshToken
       })
+      console.log(mongoRefreshToken)
+      await mongoRefreshToken.save()
+      console.log('Guaradado')
+      res.setHeader('X-User-ID', user.id)
+      res.setHeader('X-Username', user.username)
 
       res.json({
-        message: 'User logged in successfully',
-        username: user.username
+        message: 'User logged in successfully'
       })
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })

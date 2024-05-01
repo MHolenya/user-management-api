@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-
+import Token from '../models/Token.js'
 /**
  * Middleware to authenticate JWT token.
  * @param {object} req - Express request object.
@@ -62,12 +62,14 @@ export function authenticateRefreshToken(req, res, next) {
  * @returns {void}
  */
 // eslint-disable-next-line space-before-function-paren
-export function authenticateJWT(req, res, next) {
-  const username = req.body.username
+export async function authenticateJWT(req, res, next) {
+  const userId = req.headers['X-User-ID']
+  const username = req.headers['X-Username']
+
   // Check for access token
   const token = req.cookies.token
   // Check for refresh token
-  const refreshToken = req.cookies.refresh_token
+  const refreshToken = await Token.findOne({ userId })
   try {
     if (!token && !refreshToken) {
       // If no token or refresh token, return 401 Unauthorized
@@ -95,12 +97,10 @@ export function authenticateJWT(req, res, next) {
         expires: expireDateToken,
         sameSite: 'strict'
       })
-      res.cookie('refresh_token', newRefreshToken, {
-        secure: true,
-        httpOnly: true,
-        expires: expireDateRefreshToken,
-        sameSite: 'strict'
-      })
+      refreshToken.refresh_token = newRefreshToken
+      refreshToken.refresh_token_expiration = expireDateRefreshToken
+
+      await refreshToken.save()
     }
     // Set user object in request
     req.user = user
@@ -109,9 +109,6 @@ export function authenticateJWT(req, res, next) {
     // Clear cookies and return 401 Unauthorized on error
     if (token) {
       res.clearCookie('token')
-    }
-    if (refreshToken) {
-      res.clearCookie('refresh_token')
     }
     res.status(401).json({ message: 'Unauthorized' })
   }
