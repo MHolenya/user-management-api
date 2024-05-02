@@ -4,6 +4,7 @@ import userRoute from './routes/userRouter.js'
 import dotenv from 'dotenv'
 import connectDB from './controllers/datatabaseController.js'
 import rateLimitingMiddleware from './middleware/rateLimit.js'
+import authenticateApiToken from './middleware/authenticateToken.js'
 import cors from 'cors'
 import csrf from 'csurf'
 import logger from 'morgan'
@@ -20,18 +21,20 @@ const csrfProtection = csrf({ cookie: true })
 
 // Middleware to parse JSON bodies
 app.use(express.json())
-// Midleware cors 
+// Midleware cors
 app.use(cors({ origin: ORIGIN, credentials: true }))
 
 // Use cookie-parser middleware
 app.use(cookieParser())
 
 // Use CSRF protection middleware
-//  app.use(csrfProtection)
+app.use(csrfProtection)
 
 // Apply rate limiting middleware
 app.use(rateLimitingMiddleware)
 
+// Apply API token middleware
+app.use(authenticateApiToken)
 // Route for user-related endpoints
 app.use('/user', userRoute)
 

@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken'
 import Token from '../models/Token.js'
+
 /**
- * Middleware to authenticate JWT token.
+ * Middleware to authenticate API token.
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
  * @param {function} next - Next middleware function.
  * @returns {void}
  */
-export function authenticateToken(req, res, next) {
+export function authenticateUserToken(req, res, next) {
   const token = req.cookies.token
   try {
     // If no token, return 401 Unauthorized
@@ -24,6 +25,29 @@ export function authenticateToken(req, res, next) {
     // Clear cookie and return 401 Unauthorized on error
     res.clearCookie('token')
     res.status(401).json({ message: 'Unauthorized' })
+  }
+}
+
+/**
+ * Middleware to authenticate JWT token.
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Next middleware function.
+ * @returns {void}
+ */
+export default function authenticateApiToken(req, res, next) {
+  try {
+    const token = req.headers.authorization
+    // If no token, return 401 Unauthorized
+    if (!token || token !== process.env.API_TOKEN) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+    // If token is valid, proceed to the next middleware
+    next()
+  } catch (error) {
+    // If an error occurs, return 500 Internal Server Error
+    console.error('Error in authenticateApiToken middleware:', error)
+    res.status(500).json({ message: 'Internal Server Error' })
   }
 }
 
