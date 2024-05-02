@@ -16,5 +16,6 @@ router.post('/signup', inputValidationSignUp, userController.signUp)
 
 // Route to login a user
 router.post('/login', inputValidationLogin, userController.Login)
+router.post('/logout', userController.LogOut)
 
 export default router

@@ -59,7 +59,6 @@ const userController = {
       await user.save()
       res.json({ message: 'User created successfully' })
     } catch (error) {
-      console.error('Error in signUp:', error)
       res.status(500).json({ message: 'Internal server error' })
     }
   },
@@ -105,11 +104,9 @@ const userController = {
         userId: user.id,
         refresh_token_expiration: expireDateRefreshToken
       })
-      console.log(mongoRefreshToken)
       await mongoRefreshToken.save()
-      console.log('Guaradado')
-      res.setHeader('X-User-ID', user.id)
-      res.setHeader('X-Username', user.username)
+      res.setHeader('x-user-id', user.id)
+      res.setHeader('x-username', user.username)
 
       res.json({
         message: 'User logged in successfully'
@@ -154,11 +151,20 @@ const userController = {
     try {
       const { username } = req.user
       // Find the user by username and delete it
-      const user = await User.findOneAndDelete({ username })
-      // Check if the user exists
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' })
-      }
+      await User.findOneAndDelete({ username })
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' })
+    }
+  },
+  LogOut: async (req, res) => {
+    const userId = req.headers['x-user-id']
+    try {
+      await Token.findOneAndDelete({ userId })
+      res.removeHeader('x-user-id')
+      res.removeHeader('x-username')
+      res.json({
+        message: 'logout complete'
+      })
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' })
     }
